@@ -6,6 +6,7 @@
 # https://www.drupal.org/docs/develop/using-composer
 
 # Ignore configuration files that may contain sensitive information
+/web/sites/settings.local.php
 /web/sites/*/*settings*.php
 /web/sites/*/*services*.yml
 
@@ -63,3 +64,9 @@
 
 # Ignore PHPunit output
 /web/sites/simpletest
+
+# Ignore VS Code Stuff
+.vscode
+
+# Don't F-with a Mac
+.DS_Store
