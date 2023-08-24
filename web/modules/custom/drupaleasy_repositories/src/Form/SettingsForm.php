@@ -32,8 +32,8 @@ final class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $form['repositories_plugins'] = [
       '#type' => 'checkboxes',
-      '#options' => ['yml_remote' => 'Yml remote'],
-      '#title' => $this->t('Repository Plugin'),
+      '#options' => ['yml_remote' => 'Yml Remote'],
+      '#title' => $this->t('Repository plugins'),
     ];
     return parent::buildForm($form, $form_state);
   }

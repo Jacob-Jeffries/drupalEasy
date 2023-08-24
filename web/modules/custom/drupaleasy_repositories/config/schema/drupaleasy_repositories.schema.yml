@@ -5,6 +5,6 @@ drupaleasy_repositories.settings:
   mapping:
     repositories_plugins:
       type: sequence
-      label: 'Repository Plugins'
+      label: 'Repository plugins'
       sequence:
         type: string
