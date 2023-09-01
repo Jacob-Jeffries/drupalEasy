@@ -19,6 +19,7 @@
         "drupal/admin_toolbar": "^3.4",
         "drupal/core": "^10.1",
         "drupal/core-composer-scaffold": "^10.1",
+        "drupal/core-dev": "^10.1",
         "drupal/core-project-message": "^10.1",
         "drupal/core-recommended": "^10.1",
         "drupal/devel": "^5.1",
@@ -97,7 +98,6 @@
         }
     },
     "require-dev": {
-        "drupal/core-dev": "^10.1",
         "kint-php/kint": "^5.0",
         "phpstan/phpstan-deprecation-rules": "^1.1"
     }

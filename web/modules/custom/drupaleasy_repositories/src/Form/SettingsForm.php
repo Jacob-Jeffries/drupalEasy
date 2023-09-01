@@ -21,46 +21,54 @@ final class SettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @return array<mixed>
+   *   Mixed array out.
    */
   protected function getEditableConfigNames(): array {
     return ['drupaleasy_repositories.settings'];
   }
 
   /**
-   * {@inheritdoc}
+   * Form constructor.
+   *
+   * @param array<mixed> $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array<mixed>
+   *   The form structure.
+   *   The <mixed> attribute has been added to define the itterable array.
+   *   Instead of inheriting we are redefining it to pass phpstan lvl=6.
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
+    $repositories_config = $this
+      ->config('drupaleasy_repositories.settings')
+      ->get('repositories_plugins') ?? [];
     $form['repositories_plugins'] = [
       '#type' => 'checkboxes',
-      '#options' => ['yml_remote' => 'Yml Remote'],
+      '#options' => [
+        'yaml_local' => $this->t('Yaml Local'),
+        'gh_remote' => $this->t('GitHub Remote'),
+      ],
       '#title' => $this->t('Repository plugins'),
+      '#default_value' => $repositories_config,
     ];
     return parent::buildForm($form, $form_state);
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state): void {
-    // @todo Validate the form here.
-    // Example:
-    // @code
-    //   if ($form_state->getValue('example') === 'wrong') {
-    //     $form_state->setErrorByName(
-    //       'message',
-    //       $this->t('The value is not correct.'),
-    //     );
-    //   }
-    // @endcode
-    parent::validateForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
+   * Form constructor.
+   *
+   * @param array<mixed> $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->config('drupaleasy_repositories.settings')
-      ->set('example', $form_state->getValue('example'))
+      ->set('repositories_plugins', $form_state->getValue('repositories_plugins'))
       ->save();
     parent::submitForm($form, $form_state);
   }
