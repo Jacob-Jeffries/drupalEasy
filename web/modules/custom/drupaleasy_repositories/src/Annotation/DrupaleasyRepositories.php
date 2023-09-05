@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
 
 namespace Drupal\drupaleasy_repositories\Annotation;
 
@@ -21,7 +23,7 @@ final class DrupaleasyRepositories extends Plugin {
    *
    * @ingroup plugin_translatable
    */
-  public readonly string $title;
+  public readonly string $label;
 
   /**
    * The description of the plugin.

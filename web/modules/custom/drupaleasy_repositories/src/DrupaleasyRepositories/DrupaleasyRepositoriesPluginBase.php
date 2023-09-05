@@ -1,6 +1,8 @@
-<?php declare(strict_types = 1);
+<?php
 
-namespace Drupal\drupaleasy_repositories;
+declare(strict_types = 1);
+
+namespace Drupal\drupaleasy_repositories\DrupaleasyRepositories;
 
 use Drupal\Component\Plugin\PluginBase;
 
@@ -15,6 +17,14 @@ abstract class DrupaleasyRepositoriesPluginBase extends PluginBase implements Dr
   public function label(): string {
     // Cast the label to a string since it is a TranslatableMarkup object.
     return (string) $this->pluginDefinition['label'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate(string $uri): bool {
+    // This will require future plugins to write their own custom validators.
+    return FALSE;
   }
 
 }
