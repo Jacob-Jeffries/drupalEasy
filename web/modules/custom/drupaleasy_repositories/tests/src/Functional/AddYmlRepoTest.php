@@ -55,10 +55,13 @@ final class AddYmlRepoTest extends BrowserTestBase {
     $admin_user = $this->drupalCreateUser(['configure drupaleasy repositories']);
     $this->drupalLogin($admin_user);
 
+    // Create Repository content type by using the Traits file bellow.
     // $this->createRepositoryContentType();
-    // // With a functional test like ours, the Repo URL field must be visible.
-    // // This means that it needs a view mode configured, such that the test.
-    // // Is able to submit the form with the field.
+    // The config/install are automatically installed and cannot be overwritten.
+    // --
+    // With a functional test like ours, the Repo URL field must be visible.
+    // This means that it needs a view mode configured, such that the test.
+    // Is able to submit the form with the field.
     /** @var \Drupal\Core\Entity\EntityDisplayRepository $entity_display_repository  */
     $entity_display_repository = \Drupal::service('entity_display.repository');
     $entity_display_repository->getFormDisplay('user', 'user', 'default')
@@ -91,8 +94,8 @@ final class AddYmlRepoTest extends BrowserTestBase {
    * @test
    */
   public function testUnprivilegedUser(): void {
-    $authUser = $this->drupalCreateUser(['access content']);
-    $this->drupalLogin($authUser);
+    $authenticatedUser = $this->drupalCreateUser(['access content']);
+    $this->drupalLogin($authenticatedUser);
     $session = $this->assertSession();
     $this->drupalGet('admin/config/services/repositories');
     $session->statusCodeEquals(403);
@@ -111,8 +114,8 @@ final class AddYmlRepoTest extends BrowserTestBase {
    * @test
    */
   public function testSettingsPage(): void {
-    $user = $this->drupalCreateUser(['configure drupaleasy repositories']);
-    $this->drupalLogin($user);
+    $authorizedUser = $this->drupalCreateUser(['configure drupaleasy repositories']);
+    $this->drupalLogin($authorizedUser);
 
     // Get a handle on the browsing session.
     $session = $this->assertSession();
