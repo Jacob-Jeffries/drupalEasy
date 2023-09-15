@@ -52,6 +52,7 @@ final class AddYmlRepoTest extends BrowserTestBase {
     // Create and login as a user with permission to access the
     // Drupal Easy Settings Page.
     // When installing drupal the UID = 1 is created, the Admin user.
+    // The user created below is UID = 2.
     $admin_user = $this->drupalCreateUser(['configure drupaleasy repositories']);
     $this->drupalLogin($admin_user);
 
@@ -59,9 +60,25 @@ final class AddYmlRepoTest extends BrowserTestBase {
     // $this->createRepositoryContentType();
     // The config/install are automatically installed and cannot be overwritten.
     // --
+    // We could add the field_repository_url creation here (or config/install).
+    // FieldStorageConfig::create([
+    // 'field_name' => 'field_repository_url',
+    // 'type' => 'link',
+    // 'entity_type' => 'user',
+    // 'cardinality' => -1,
+    // ])->save();
+    // FieldConfig::create([
+    // 'field_name' => 'field_repository_url',
+    // 'entity_type' => 'user',
+    // 'bundle' => 'user',
+    // 'label' => 'Repository URL',
+    // ])->save();
+    // --
     // With a functional test like ours, the Repo URL field must be visible.
     // This means that it needs a view mode configured, such that the test.
     // Is able to submit the form with the field.
+    // Ensure that the new Repository URL field is visible in the existing
+    // user entity form mode.
     /** @var \Drupal\Core\Entity\EntityDisplayRepository $entity_display_repository  */
     $entity_display_repository = \Drupal::service('entity_display.repository');
     $entity_display_repository->getFormDisplay('user', 'user', 'default')
@@ -156,12 +173,12 @@ final class AddYmlRepoTest extends BrowserTestBase {
   public function testAddYmlRepo(): void {
     // Create and login as a Drupal user with permission to access
     // content.
-    $user = $this->drupalCreateUser(['access content']);
-    $this->drupalLogin($user);
+    $authenticatedUser = $this->drupalCreateUser(['access content']);
+    $this->drupalLogin($authenticatedUser);
     // Get a handle on the browsing session.
     $session = $this->assertSession();
     // Navigate to their edit profile page and confirm we can reach it.
-    $this->drupalGet('/user/' . $user->id() . '/edit');
+    $this->drupalGet('/user/' . $authenticatedUser->id() . '/edit');
     // Try this with a 500 status code to see it fail.
     $session->statusCodeEquals(200);
 
