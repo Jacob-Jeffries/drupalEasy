@@ -43,6 +43,7 @@ final class SettingsForm extends ConfigFormBase {
    *   Instead of inheriting we are redefining it to pass phpstan lvl=6.
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
+    // THIS IS THE ADMIN FORM FOR THE MODULE, it enables/disables DER plugins.
     $repositories_config = $this
       ->config('drupaleasy_repositories.settings')
       ->get('repositories_plugins') ?? [];
