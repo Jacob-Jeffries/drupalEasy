@@ -50,7 +50,7 @@ final class SettingsForm extends ConfigFormBase {
     $form['repositories_plugins'] = [
       '#type' => 'checkboxes',
       '#options' => [
-        'yaml_local' => $this->t('Yaml Local'),
+        'yaml_remote' => $this->t('Yaml Remote'),
         'gh_remote' => $this->t('GitHub Remote'),
       ],
       '#title' => $this->t('Repository plugins'),

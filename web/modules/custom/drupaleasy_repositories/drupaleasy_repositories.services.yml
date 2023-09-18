@@ -1,3 +1,5 @@
+# This is a typical Drupal Services Definition File.
+# It points to the service: Plugin Manager, for our module.
 services:
   plugin.manager.drupaleasy_repositories:
     class: Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginManager
