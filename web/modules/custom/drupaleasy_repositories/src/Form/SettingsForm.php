@@ -4,13 +4,47 @@ declare(strict_types = 1);
 
 namespace Drupal\drupaleasy_repositories\Form;
 
+use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Configure DrupalEasy Repositories settings for this site.
  */
 final class SettingsForm extends ConfigFormBase {
+
+  /**
+   * The DrupalEasy repositories manager service.
+   *
+   * @var \Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginManager
+   */
+  protected DrupaleasyRepositoriesPluginManager $repositoriesManager;
+
+  /**
+   * Constructs an SettingsForm object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginManager $drupaleasy_repositories_manager
+   *   The DrupalEasy repositories manager service.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, DrupaleasyRepositoriesPluginManager $drupaleasy_repositories_manager) {
+    parent::__construct($config_factory);
+    $this->repositoriesManager = $drupaleasy_repositories_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('plugin.manager.drupaleasy_repositories')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -30,32 +64,45 @@ final class SettingsForm extends ConfigFormBase {
   }
 
   /**
-   * Form constructor.
+   * {@inheritdoc}
    *
-   * @param array<mixed> $form
-   *   An associative array containing the structure of the form.
+   * @param array<string, mixed> $form
+   *   The form array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
+   *   The form state array.
    *
-   * @return array<mixed>
-   *   The form structure.
-   *   The <mixed> attribute has been added to define the itterable array.
-   *   Instead of inheriting we are redefining it to pass phpstan lvl=6.
+   * @return array<int, mixed>
+   *   The form array.
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    // THIS IS THE ADMIN FORM FOR THE MODULE, it enables/disables DER plugins.
-    $repositories_config = $this
-      ->config('drupaleasy_repositories.settings')
-      ->get('repositories_plugins') ?? [];
+    $repositories = $this->repositoriesManager->getDefinitions();
+    $repositories_config = $this->config('drupaleasy_repositories.settings');
+
+    uasort($repositories, function ($a, $b) {
+      return Unicode::strcasecmp($a['label'], $b['label']);
+    });
+    $repository_options = [];
+    foreach ($repositories as $repository => $definition) {
+      $repository_options[$repository] = $definition['label'];
+    }
+
+    // $form['repositories_plugins'] = [
+    //   '#type' => 'checkboxes',
+    //   '#options' => [
+    //     'yaml_remote' => $this->t('Yaml Remote'),
+    //     'gh_remote' => $this->t('GitHub Remote'),
+    //   ],
+    //   '#title' => $this->t('Repository plugins'),
+    //   '#default_value' => $repositories_config,
+    // ];
+    // With the new code below, the options are gleaned from the pluginManager.
     $form['repositories_plugins'] = [
       '#type' => 'checkboxes',
-      '#options' => [
-        'yaml_remote' => $this->t('Yaml Remote'),
-        'gh_remote' => $this->t('GitHub Remote'),
-      ],
-      '#title' => $this->t('Repository plugins'),
-      '#default_value' => $repositories_config,
+      '#options' => $repository_options,
+      '#title' => $this->t('Repositories'),
+      '#default_value' => $repositories_config->get('repositories_plugins'),
     ];
+
     return parent::buildForm($form, $form_state);
   }
 
