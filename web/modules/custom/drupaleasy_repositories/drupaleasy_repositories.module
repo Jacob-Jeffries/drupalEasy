@@ -19,7 +19,8 @@ function drupaleasy_repositories_form_user_form_alter(array &$form, FormStateInt
       $form['field_repository_url']['widget'][$el_index]['#process'][] = '_drupaleasy_repositories_url_help_text';
     }
   }
-  // This validator is called using single quotes because it is being added to the array.
+  // This validator is called using single quotes,
+  // because it is being added to the array.
   $form['#validate'][] = '_drupaleasy_repositories_user_form_validate';
 }
 

@@ -76,7 +76,9 @@ final class SettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
     $repositories = $this->repositoriesManager->getDefinitions();
-    $repositories_config = $this->config('drupaleasy_repositories.settings');
+    $repositories_config = $this
+      ->config('drupaleasy_repositories.settings')
+      ->get('repositories_plugins') ?? [];
 
     uasort($repositories, function ($a, $b) {
       return Unicode::strcasecmp($a['label'], $b['label']);
@@ -87,20 +89,20 @@ final class SettingsForm extends ConfigFormBase {
     }
 
     // $form['repositories_plugins'] = [
-    //   '#type' => 'checkboxes',
-    //   '#options' => [
-    //     'yaml_remote' => $this->t('Yaml Remote'),
-    //     'gh_remote' => $this->t('GitHub Remote'),
-    //   ],
-    //   '#title' => $this->t('Repository plugins'),
-    //   '#default_value' => $repositories_config,
+    // '#type' => 'checkboxes',
+    // '#options' => [
+    // 'yaml_remote' => $this->t('Yaml Remote'),
+    // 'gh_remote' => $this->t('GitHub Remote'),
+    // ],
+    // '#title' => $this->t('Repository plugins'),
+    // '#default_value' => $repositories_config,
     // ];
     // With the new code below, the options are gleaned from the pluginManager.
     $form['repositories_plugins'] = [
       '#type' => 'checkboxes',
       '#options' => $repository_options,
       '#title' => $this->t('Repositories'),
-      '#default_value' => $repositories_config->get('repositories_plugins'),
+      '#default_value' => $repositories_config,
     ];
 
     return parent::buildForm($form, $form_state);
