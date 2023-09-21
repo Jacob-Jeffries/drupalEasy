@@ -15,31 +15,18 @@ final class DrupaleasyRepositoriesService {
   use StringTranslationTrait;
 
   /**
-   * The plugin manager for DrupaleasyRepositories.
-   *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
-   */
-  protected PluginManagerInterface $pluginManagerDrupaleasyRepositories;
-
-  /**
-   * The configuration factory interface.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected ConfigFactoryInterface $configFactory;
-
-  /**
    * Constructs a DrupaleasyRepositories object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager_drupaleasy_repositories
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManagerDrupaleasyRepositories
    *   The plugin manager interface.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory interface.
+   *
+   *   Using property promotion, we do not need to list properties.
    */
-  public function __construct(PluginManagerInterface $plugin_manager_drupaleasy_repositories, ConfigFactoryInterface $config_factory) {
-    $this->pluginManagerDrupaleasyRepositories = $plugin_manager_drupaleasy_repositories;
-    $this->configFactory = $config_factory;
-  }
+  public function __construct(
+    protected PluginManagerInterface $pluginManagerDrupaleasyRepositories,
+    protected ConfigFactoryInterface $configFactory) {}
 
   /**
    * Get repository URL help text from each enabled plugin.

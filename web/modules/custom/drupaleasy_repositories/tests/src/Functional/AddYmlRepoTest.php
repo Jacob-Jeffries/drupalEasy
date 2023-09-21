@@ -144,8 +144,7 @@ final class AddYmlRepoTest extends BrowserTestBase {
     // Check the YAML remote checkbox.
     // I used the form name instead of the id since that is what a POST sends.
     $edit = [
-      'repositories_plugins[yaml_local]' => 'yaml_local',
-      'repositories_plugins[gh_remote]' => 0,
+      'repositories_plugins[yml_remote]' => 'yml_remote',
     ];
 
     // Submit the form.
@@ -156,8 +155,7 @@ final class AddYmlRepoTest extends BrowserTestBase {
     $session->statusCodeEquals(200);
     $session->statusMessageExists();
     $session->statusMessageContains('The configuration options have been saved.');
-    $session->checkboxChecked('repositories_plugins[yaml_local]');
-    $session->checkboxNotChecked('repositories_plugins[gh_remote]');
+    $session->checkboxChecked('repositories_plugins[yml_remote]');
   }
 
   /**
