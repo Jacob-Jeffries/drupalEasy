@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -22,6 +23,11 @@ function drupaleasy_repositories_form_user_form_alter(array &$form, FormStateInt
   // This validator is called using single quotes,
   // because it is being added to the array.
   $form['#validate'][] = '_drupaleasy_repositories_user_form_validate';
+
+  // Our submit handler is going to happen after the regular submit handler.
+  // We could find this in Xdebug by looking at the $form array.
+  // The #submit array order could be changed if you want -> [1] = _method.
+  $form['actions']['submit']['#submit'][] = '_drupaleasy_repositories_user_form_submit';
 }
 
 /**
@@ -77,4 +83,33 @@ function _drupaleasy_repositories_user_form_validate(array $form, FormStateInter
       $error,
     );
   }
+}
+
+/**
+ * Custom submit handler for user profile form.
+ *
+ * @param array $form
+ *   The form.
+ * @param Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state.
+ *
+ * @return void
+ *   This returns nothing.
+ */
+function _drupaleasy_repositories_user_form_submit(array $form, FormStateInterface &$form_state): void {
+  /** @var \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService $repository_service */
+  // We are in a hook so we can just spin up the service container.
+  $repository_service = \Drupal::service('drupaleasy_repositories.service');
+
+  // We are pulling the account information from the $form_state-getValue().
+  // By passing User::load an id, it will give us account information.
+  $account = User::load($form_state->getValue('uid'));
+
+  // Since our submit handler runs last, the URLs have already been saved.
+  // That means we only need to give the user account for the method.
+  // Since load could return null, we will protect the next method.
+  if (!is_null($account)) {
+    $repository_service->updateRepositories($account);
+  }
+
 }

@@ -6,6 +6,8 @@ namespace Drupal\drupaleasy_repositories;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -21,12 +23,15 @@ final class DrupaleasyRepositoriesService {
    *   The plugin manager interface.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The configuration factory interface.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity_type.manager service.
    *
    *   Using property promotion, we do not need to list properties.
    */
   public function __construct(
     protected PluginManagerInterface $pluginManagerDrupaleasyRepositories,
-    protected ConfigFactoryInterface $configFactory) {}
+    protected ConfigFactoryInterface $configFactory,
+    protected EntityTypeManagerInterface $entityTypeManager) {}
 
   /**
    * Get repository URL help text from each enabled plugin.
@@ -116,6 +121,70 @@ final class DrupaleasyRepositoriesService {
     }
     // No errors found.
     return '';
+  }
+
+  /**
+   * Update the repository nodes for a given account.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $account
+   *   The user account whose repositories to update.
+   *   We are using EntityInterface, because that is what Drush returns.
+   *
+   * @return bool
+   *   TRUE if successful.
+   */
+  public function updateRepositories(EntityInterface $account): bool {
+    // Query plugins.
+    // Get URLs & match plugin type.
+    // Loop through getRepo(), and get Metadata.
+    // Create or Update Node.
+    // Delete nodes that have been removed (no URL).
+    $repos_metadata = [];
+    $repositories_plugin_ids = $this->configFactory
+      ->get('drupaleasy_repositories.settings')
+      ->get('repositories_plugins') ?? [];
+
+    // We are going to initialize all the plugins, validate, then getRepo().
+    foreach ($repositories_plugin_ids as $repository_plugin_id) {
+      if (!empty($repository_plugin_id)) {
+
+        // The plugin manager can create instances.
+        /** @var \Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesInterface $repository_plugin */
+        $repository_plugin = $this->pluginManagerDrupaleasyRepositories->createInstance($repository_plugin_id);
+
+        // Loop through repository URLs.
+        // The field is on the user object, we set this up in the begining.
+        foreach ($account->field_repository_url ?? [] as $url) {
+          // Check if the URL validates for this repository.
+          // Using the validate to make sure we have the correct plugin.
+          if ($repository_plugin->validate($url->uri)) {
+            $uri = $url->uri;
+            // Confirm the repository exists and get metadata.
+            // If the getRepo() finds something the expression is true.
+            if ($repo_metadata = $repository_plugin->getRepo($uri)) {
+              $repos_metadata += $repo_metadata;
+            }
+          }
+        }
+
+      }
+    }
+    return $this->updateRepositoryNodes($repos_metadata, $account);
+  }
+
+  /**
+   * Update repository nodes for a given user.
+   *
+   * @param array<string, array<string, string>> $repos_info
+   *   Repository info from API call.
+   * @param \Drupal\Core\Entity\EntityInterface $account
+   *   The user account whose repositories to update.
+   *
+   * @return bool
+   *   TRUE if successful.
+   */
+  protected function updateRepositoryNodes(array $repos_info, EntityInterface $account): bool {
+    return FALSE;
   }
 
 }
