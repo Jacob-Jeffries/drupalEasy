@@ -105,15 +105,25 @@ final class DrupaleasyRepositoriesService {
     foreach ($urls as $url) {
       if (is_array($url)) {
         if ($uri = trim($url['uri'])) {
-          $validated = FALSE;
+          $is_valid_url = FALSE;
           // Check to see if the URI is valid for any enabled plugins.
           /** @var \Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesInterface $repository_plugin */
           foreach ($repository_plugins as $repository_plugin) {
             if ($repository_plugin->validate($uri)) {
-              $validated = TRUE;
+              $is_valid_url = TRUE;
+              $repo_info = $repository_plugin->getRepo($uri);
+              if ($repo_info) {
+                if (!$this->isUnique($repo_info, $uid)) {
+                  $errors[] = $this->t('The repository at %uri has been added by another user.', ['%uri' => $uri]);
+                  break;
+                }
+              }
+              else {
+                $errors[] = $this->t('The repository at the url %uri was not found.', ['%uri' => $uri]);
+              }
             }
           }
-          if (!$validated) {
+          if (!$is_valid_url) {
             $errors[] = $this->t('The repository url %uri is not valid.', ['%uri' => $uri]);
           }
         }
@@ -303,6 +313,38 @@ final class DrupaleasyRepositoriesService {
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Check to see if the repository is unique.
+   *
+   * @param array $repo_info
+   *   The repository info.
+   * @param int $uid
+   *   The user ID of the submitter.
+   *
+   * @return bool
+   *   Return true if the repository is unique.
+   */
+  protected function isUnique(array $repo_info, int $uid): bool {
+    $node_storage = $this->entityTypeManager->getStorage('node');
+
+    $repo_metadata = array_pop($repo_info);
+
+    // Look for repository nodes with a matching url.
+    $query = $node_storage->getQuery();
+    $results = $query->condition('type', 'repository')
+      ->condition('field_url', $repo_metadata['url'])
+      ->condition('uid', $uid, '<>')
+      ->accessCheck(FALSE)
+      ->execute();
+
+    if ($results) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
 
 }
