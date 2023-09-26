@@ -24,6 +24,7 @@ function drupaleasy_repositories_form_user_form_alter(array &$form, FormStateInt
   // because it is being added to the array.
   $form['#validate'][] = '_drupaleasy_repositories_user_form_validate';
 
+  // The Submit handler does not run if the above validation does not pass.
   // Our submit handler is going to happen after the regular submit handler.
   // We could find this in Xdebug by looking at the $form array.
   // The #submit array order could be changed if you want -> [1] = _method.

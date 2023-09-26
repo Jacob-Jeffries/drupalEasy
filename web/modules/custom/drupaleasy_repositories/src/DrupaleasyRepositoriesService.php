@@ -72,7 +72,7 @@ final class DrupaleasyRepositoriesService {
    * Validate the URLs are valid based on the enabled plugins and ensure they
    * haven't been added by another user.
    *
-   * @param array $urls
+   * @param array<mixed> $urls
    *   The urls to be validated.
    * @param int $uid
    *   The user id of the user submitting the URLs.
@@ -179,7 +179,7 @@ final class DrupaleasyRepositoriesService {
   /**
    * Update repository nodes for a given user.
    *
-   * @param array<string, array<string, string>> $repos_info
+   * @param array<string, array<string, string|int>> $repos_info
    *   Repository info from API call.
    * @param \Drupal\Core\Entity\EntityInterface $account
    *   The user account whose repositories to update.
@@ -220,15 +220,31 @@ final class DrupaleasyRepositoriesService {
 
     if ($results) {
       /** @var \Drupal\node\Entity\Node $node */
+      // The all the stroage types have a load method.
+      // Reset points to the first Key in the array.
       $node = $node_storage->load(reset($results));
 
       if ($hash != $node->get('field_hash')->value) {
         // Something changed, update node.
+        $node->setTitle((string) $repo_info['label']);
+        $node->set('field_description', $repo_info['description']);
+        $node->set('field_machine_name', $key);
+        $node->set('field_number_of_issues', $repo_info['num_open_issues']);
+        $node->set('field_source', $repo_info['source']);
+        $node->set('field_url', $repo_info['url']);
+        $node->set('field_hash', $hash);
+        // If we stop here, only the node instance is updated, we still need to
+        // save to the DB.
+        if (!$this->dryRun) {
+          $node->save();
+          // $this->repoUpdated($node, 'updated');
+        }
         return TRUE;
       }
     }
     else {
       // Repository node doesn't exist - create a new one.
+      // The field API values are the ones we've added that start with field_.
       /** @var \Drupal\node\NodeInterface $node */
       $node = $node_storage->create([
         'uid' => $account->id(),
@@ -244,8 +260,9 @@ final class DrupaleasyRepositoriesService {
       if (!$this->dryRun) {
         $node->save();
       }
+      return TRUE;
     }
-    return TRUE;
+    return FALSE;
   }
 
 }
