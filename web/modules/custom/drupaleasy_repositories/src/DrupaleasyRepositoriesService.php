@@ -9,6 +9,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 
 /**
  * This is our custom service for the plugin.
@@ -25,13 +27,17 @@ final class DrupaleasyRepositoriesService {
    *   The configuration factory interface.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity_type.manager service.
+   * @param bool $dryRun
+   *   When set to TRUE, no nodes are CRUD'd, defaulted to FALSE.
    *
    *   Using property promotion, we do not need to list properties.
    */
   public function __construct(
     protected PluginManagerInterface $pluginManagerDrupaleasyRepositories,
     protected ConfigFactoryInterface $configFactory,
-    protected EntityTypeManagerInterface $entityTypeManager) {}
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected bool $dryRun = FALSE,
+  ) {}
 
   /**
    * Get repository URL help text from each enabled plugin.
@@ -184,7 +190,62 @@ final class DrupaleasyRepositoriesService {
    *   TRUE if successful.
    */
   protected function updateRepositoryNodes(array $repos_info, EntityInterface $account): bool {
-    return FALSE;
+    // Does this metadata already exist?
+    // No -> Create Node.
+    // Yes -> compare hash update or die.
+    // Remove all nodes of type Repo that belong to this user without URL.
+    // Entity Querey -> as if entities are SQL based.
+    if (!$repos_info) {
+      return FALSE;
+    }
+
+    // Prepare the storage and query stuff.
+    // Give me all the storage perameters for all 'nodes'.
+    /** @var \Drupal\node\NodeStorageInterface $node_storage */
+    $node_storage = $this->entityTypeManager->getStorage('node');
+
+    foreach ($repos_info as $key => $repo_info) {
+      // Calculate Hash value.
+      $hash = md5(serialize($repo_info));
+    }
+
+    // We are building a query very similiar to how an ORM would work.
+    $query = $node_storage->getQuery();
+    $query->condition('type', 'repository')
+      ->condition('uid', $account->id())
+      ->condition('field_machine_name', $key)
+      ->condition('field_source', $repo_info['source'])
+      ->accessCheck(FALSE);
+    $results = $query->execute();
+
+    if ($results) {
+      /** @var \Drupal\node\Entity\Node $node */
+      $node = $node_storage->load(reset($results));
+
+      if ($hash != $node->get('field_hash')->value) {
+        // Something changed, update node.
+        return TRUE;
+      }
+    }
+    else {
+      // Repository node doesn't exist - create a new one.
+      /** @var \Drupal\node\NodeInterface $node */
+      $node = $node_storage->create([
+        'uid' => $account->id(),
+        'type' => 'repository',
+        'title' => $repo_info['label'],
+        'field_description' => $repo_info['description'],
+        'field_machine_name' => $key,
+        'field_number_of_issues' => $repo_info['num_open_issues'],
+        'field_source' => $repo_info['source'],
+        'field_url' => $repo_info['url'],
+        'field_hash' => $hash,
+      ]);
+      if (!$this->dryRun) {
+        $node->save();
+      }
+    }
+    return TRUE;
   }
 
 }

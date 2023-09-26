@@ -192,7 +192,8 @@ final class AddYmlRepoTest extends BrowserTestBase {
     // but it is still not what we need.
     // Folks will have different localhosts I think.
     global $base_url;
-    $path = $base_url . '/' . $module->getPath() . '/tests/assets/test_repo.yml';
+    // $path = $base_url . '/' . $module->getPath() . '/tests/assets/batman-repo.yml';
+    $path = 'http://localhost/batman-repo.yml';
 
     // Enter information in the URL Field.
     // Using the module handler service.
@@ -209,7 +210,7 @@ final class AddYmlRepoTest extends BrowserTestBase {
     $query = \Drupal::entityQuery('node');
     $query->condition('type', 'repository');
     // Check if the current user has access to the returned entities.
-    $query->accessCheck(TRUE);
+    $query->accessCheck(FALSE);
     // Returns an array of node id's that meet our criteria.
     $results = $query->execute();
     $session->assert(count($results) === 1, 'Either 0 or >1 repository nodes were found.');
@@ -232,15 +233,15 @@ final class AddYmlRepoTest extends BrowserTestBase {
     $node = $node_storage->load(reset($results));
 
     // Check values.
-    $session->assert($node->get('field_machine_name')->getValue() == 'test-repo', 'Machine name does not match.');
+    $session->assert($node->field_machine_name->value == 'batman-repo', 'Machine name does not match.');
 
-    $session->assert($node->get('field_source')->getValue() == 'yml_remote', 'Source does not match.');
+    $session->assert($node->field_source->value == 'yml_remote', 'Source does not match.');
 
     $session->assert($node->getTitle() == 'The Batman repository', 'Title does not match.');
 
-    $session->assert($node->get('field_description')->getValue() == 'This is where Batman keeps all his crime-fighting code.', 'Description does not match.');
+    $session->assert($node->field_description->value == 'This is where Batman keeps all his crime-fighting code.', 'Description does not match.');
 
-    $session->assert($node->get('field_number_of_issues')->getValue() == '6', 'Number of issues does not match.');
+    $session->assert($node->field_number_of_issues->value == '6', 'Number of issues does not match.');
 
   }
 

@@ -50,7 +50,7 @@ abstract class DrupaleasyRepositoriesPluginBase extends PluginBase implements Dr
       'description' => $description,
       'num_open_issues' => $num_open_issues,
       'source' => $this->getPluginId(),
-      'uri' => $uri,
+      'url' => $uri,
     ];
     return $repo_info;
   }
