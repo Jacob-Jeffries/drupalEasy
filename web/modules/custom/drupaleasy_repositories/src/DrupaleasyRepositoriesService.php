@@ -9,8 +9,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\node\Entity\Node;
-use Drupal\node\NodeInterface;
 
 /**
  * This is our custom service for the plugin.
@@ -210,6 +208,8 @@ final class DrupaleasyRepositoriesService {
     }
 
     // We are building a query very similiar to how an ORM would work.
+    // Adding the QueryInterface (phpstan) fixes the accessCheck error thrown.
+    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
     $query = $node_storage->getQuery();
     $query->condition('type', 'repository')
       ->condition('uid', $account->id())
