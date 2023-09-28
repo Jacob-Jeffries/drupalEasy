@@ -98,7 +98,7 @@ final class DrupaleasyRepositoriesService {
       }
     }
     if (!$atLeastOne) {
-      return 'There are no enabled repository plugins';
+      return 'There are no enabled repository plugins.';
     }
 
     // Loop around each Repository URL and attempt to validate.
