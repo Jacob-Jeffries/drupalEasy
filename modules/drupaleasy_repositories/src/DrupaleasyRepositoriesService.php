@@ -217,7 +217,6 @@ final class DrupaleasyRepositoriesService {
       // Calculate Hash value.
       $hash = md5(serialize($repo_info));
 
-
       // We are building a query very similiar to how an ORM would work.
       // Adding the QueryInterface (phpstan) fixes the accessCheck error thrown.
       /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
