@@ -12,6 +12,13 @@ use Drupal\Component\Plugin\PluginBase;
 abstract class DrupaleasyRepositoriesPluginBase extends PluginBase implements DrupaleasyRepositoriesInterface {
 
   /**
+   * The repository client used to make API calls, most APIs have a client.
+   *
+   * @var Object
+   */
+  protected Object $client;
+
+  /**
    * {@inheritdoc}
    */
   public function label(): string {

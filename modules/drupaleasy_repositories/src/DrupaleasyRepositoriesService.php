@@ -183,7 +183,7 @@ final class DrupaleasyRepositoriesService {
 
       }
     }
-    return ($this->updateRepositoryNodes($repos_metadata, $account)) || ($this->deleteRepositoryNodes($repos_metadata, $account));
+    return $this->updateRepositoryNodes($repos_metadata, $account) || $this->deleteRepositoryNodes($repos_metadata, $account);
   }
 
   /**
@@ -216,62 +216,61 @@ final class DrupaleasyRepositoriesService {
     foreach ($repos_info as $key => $repo_info) {
       // Calculate Hash value.
       $hash = md5(serialize($repo_info));
-    }
 
-    // We are building a query very similiar to how an ORM would work.
-    // Adding the QueryInterface (phpstan) fixes the accessCheck error thrown.
-    /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
-    $query = $node_storage->getQuery();
-    $query->condition('type', 'repository')
-      ->condition('uid', $account->id())
-      ->condition('field_machine_name', $key)
-      ->condition('field_source', $repo_info['source'])
-      ->accessCheck(FALSE);
-    $results = $query->execute();
 
-    if ($results) {
-      /** @var \Drupal\node\Entity\Node $node */
-      // The all the stroage types have a load method.
-      // Reset points to the first Key in the array.
-      $node = $node_storage->load(reset($results));
+      // We are building a query very similiar to how an ORM would work.
+      // Adding the QueryInterface (phpstan) fixes the accessCheck error thrown.
+      /** @var \Drupal\Core\Entity\Query\QueryInterface $query */
+      $query = $node_storage->getQuery();
+      $query->condition('type', 'repository')
+        ->condition('uid', $account->id())
+        ->condition('field_machine_name', $key)
+        ->condition('field_source', $repo_info['source'])
+        ->accessCheck(FALSE);
+      $results = $query->execute();
 
-      if ($hash != $node->get('field_hash')->value) {
-        // Something changed, update node.
-        $node->setTitle((string) $repo_info['label']);
-        $node->set('field_description', $repo_info['description']);
-        $node->set('field_machine_name', $key);
-        $node->set('field_number_of_issues', $repo_info['num_open_issues']);
-        $node->set('field_source', $repo_info['source']);
-        $node->set('field_url', $repo_info['url']);
-        $node->set('field_hash', $hash);
-        // If we stop here, only the node instance is updated, we still need to
-        // save to the DB.
+      if ($results) {
+        /** @var \Drupal\node\Entity\Node $node */
+        // The all the stroage types have a load method.
+        // Reset points to the first Key in the array.
+        $node = $node_storage->load(reset($results));
+
+        if ($hash != $node->get('field_hash')->value) {
+          // Something changed, update node.
+          $node->setTitle((string) $repo_info['label']);
+          $node->set('field_description', $repo_info['description']);
+          $node->set('field_machine_name', $key);
+          $node->set('field_number_of_issues', $repo_info['num_open_issues']);
+          $node->set('field_source', $repo_info['source']);
+          $node->set('field_url', $repo_info['url']);
+          $node->set('field_hash', $hash);
+          // If we stop here, only the node instance is updated, we still need to
+          // save to the DB.
+          if (!$this->dryRun) {
+            $node->save();
+            // $this->repoUpdated($node, 'updated');
+          }
+        }
+      }
+      else {
+        // Repository node doesn't exist - create a new one.
+        // The field API values are the ones we've added that start with field_.
+        /** @var \Drupal\node\NodeInterface $node */
+        $node = $node_storage->create([
+          'uid' => $account->id(),
+          'type' => 'repository',
+          'title' => $repo_info['label'],
+          'field_description' => $repo_info['description'],
+          'field_machine_name' => $key,
+          'field_number_of_issues' => $repo_info['num_open_issues'],
+          'field_source' => $repo_info['source'],
+          'field_url' => $repo_info['url'],
+          'field_hash' => $hash,
+        ]);
         if (!$this->dryRun) {
           $node->save();
-          // $this->repoUpdated($node, 'updated');
         }
-        return TRUE;
       }
-    }
-    else {
-      // Repository node doesn't exist - create a new one.
-      // The field API values are the ones we've added that start with field_.
-      /** @var \Drupal\node\NodeInterface $node */
-      $node = $node_storage->create([
-        'uid' => $account->id(),
-        'type' => 'repository',
-        'title' => $repo_info['label'],
-        'field_description' => $repo_info['description'],
-        'field_machine_name' => $key,
-        'field_number_of_issues' => $repo_info['num_open_issues'],
-        'field_source' => $repo_info['source'],
-        'field_url' => $repo_info['url'],
-        'field_hash' => $hash,
-      ]);
-      if (!$this->dryRun) {
-        $node->save();
-      }
-      return TRUE;
     }
     return FALSE;
   }
