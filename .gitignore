@@ -70,3 +70,6 @@
 
 # Don't F-with a Mac
 .DS_Store
+
+# Ignore Key Files - Don't be a douche and steal shit!
+/key/*

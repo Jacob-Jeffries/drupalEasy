@@ -20,11 +20,39 @@ final class YmlRemoteTest extends UnitTestCase {
   protected YmlRemote $ymlRemote;
 
   /**
+   * Mock MessengerInterface Object.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $messenger;
+
+  /**
+   * Mock KeyRepository Object.
+   *
+   * @var \Drupal\key\KeyRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $keyRepository;
+
+  /**
    * {@inheritDoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->ymlRemote = new YmlRemote([], 'yml_remote', []);
+
+    // Upon adding the GitHub Plugin, we added dependencies to that plugin.
+    // We need to fake complicated depencendies here for messenger & key.
+    // Mocking creates a fake dependency service.
+    // Mock the Messenger Service.
+    $messenger = $this->getMockBuilder('\Drupal\Core\Messenger\MessengerInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    // Mock the Key Repository Service.
+    $keyRepository = $this->getMockBuilder('\Drupal\key\KeyRepositoryInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
+
+    $this->ymlRemote = new YmlRemote([], 'yml_remote', [], $messenger, $keyRepository);
   }
 
   /**

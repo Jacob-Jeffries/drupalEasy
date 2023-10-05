@@ -60,9 +60,9 @@ final class Github extends DrupaleasyRepositoriesPluginBase {
     }
     catch (\Throwable $th) {
       // Do something with the exception extends Throwable.
-      // $this->messenger->addMessage($this->t('GitHub error: @error', [
-      // '@error' => $th->getMessage(),
-      // ]));
+      $this->messenger->addMessage($this->t('GitHub error: @error', [
+        '@error' => $th->getMessage(),
+      ]));
       return [];
     }
     finally{
@@ -84,7 +84,20 @@ final class Github extends DrupaleasyRepositoriesPluginBase {
     // The authenticate() method does not actually call the Github API,
     // rather it only stores the authentication info in $client for use when
     // $client makes an API call that requires authentication.
-    $this->client->authenticate('Jacob-Jeffries', 'GitHub_Access_Key', AuthMethod::CLIENT_ID);
+    $github_key = $this->keyRepository->getKey('github')->getKeyValues();
+
+    $this->client->authenticate($github_key['username'], $github_key['key'], AuthMethod::CLIENT_ID);
+
+    // Test the credentials with the following code block.
+    try {
+      $email = $this->client->currentUser()->emails()->allPublic();
+      $this->messenger->addMessage('GitHub Authentication Successful - Emails Received: ' . $email[0]['email']);
+    }
+    catch (\Throwable $th) {
+      $this->messenger->addMessage($this->t('GitHub error: @error', [
+        '@error' => $th->getMessage(),
+      ]));
+    }
   }
 
 }

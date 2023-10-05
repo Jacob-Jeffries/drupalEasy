@@ -19,7 +19,7 @@ final class DrupaleasyRepositoriesPluginManagerTest extends KernelTestBase {
    *
    * @var array <mixed> $modules
    */
-  protected static $modules = ['drupaleasy_repositories'];
+  protected static $modules = ['drupaleasy_repositories', 'key'];
 
   /**
    * Our plugin manager.
@@ -59,6 +59,28 @@ final class DrupaleasyRepositoriesPluginManagerTest extends KernelTestBase {
     $this->assertTrue($plugin_def['id'] == 'yml_remote', 'Plugin id does not match.');
     $this->assertTrue($plugin_def['label'] == 'Yml Remote', 'Plugin label does not match.');
     $this->assertTrue($plugin_def['description'] == 'Remote .yml file that includes repository metadata.', 'Plugin description does not match.');
+  }
+
+  /**
+   * Test creating an instance of the Github plugin.
+   *
+   * @test
+   */
+  public function testGithubInstance() {
+    /** @var \Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesInterface $example_instance */
+    $example_instance = $this->manager->createInstance('github');
+    $plugin_def = $example_instance->getPluginDefinition();
+    $this->assertInstanceOf('Drupal\drupaleasy_repositories\Plugin\DrupaleasyRepositories\Github', $example_instance, 'Plugin type does not match.');
+
+    $this->assertInstanceOf('Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginBase', $example_instance, 'Plugin parent class type does not match.');
+
+    $this->assertArrayHasKey('id', $plugin_def, 'The "id" key is missing from the plugin definition.');
+    $this->assertArrayHasKey('label', $plugin_def, 'The "Label" array key does not exist.');
+    $this->assertArrayHasKey('description', $plugin_def, 'The "description" key is missing from the plugin definition.');
+
+    $this->assertTrue($plugin_def['id'] == 'github', 'Plugin id does not match.');
+    $this->assertTrue($plugin_def['label'] == 'GitHub', 'Plugin label does not match.');
+    $this->assertTrue($plugin_def['description'] == 'GitHub.com', 'Plugin description does not match.');
   }
 
 }

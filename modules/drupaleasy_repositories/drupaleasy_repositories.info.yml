@@ -12,3 +12,4 @@ dependencies:
   - drupal:menu_ui
   - drupal:path
   - drupal:field
+  - key:key
