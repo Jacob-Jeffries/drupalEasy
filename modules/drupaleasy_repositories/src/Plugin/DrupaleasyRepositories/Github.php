@@ -91,7 +91,8 @@ final class Github extends DrupaleasyRepositoriesPluginBase {
     // Test the credentials with the following code block.
     try {
       $email = $this->client->currentUser()->emails()->allPublic();
-      $this->messenger->addMessage('GitHub Authentication Successful - Emails Received: ' . $email[0]['email']);
+      $this->messenger->addMessage('GitHub Authentication Successful');
+      $this->messenger->addMessage('Emails Received: ' . $email[0]['email']);
     }
     catch (\Throwable $th) {
       $this->messenger->addMessage($this->t('GitHub error: @error', [
