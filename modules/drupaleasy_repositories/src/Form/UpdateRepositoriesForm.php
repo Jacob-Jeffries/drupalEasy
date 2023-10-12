@@ -17,17 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class UpdateRepositoriesForm extends FormBase {
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container): UpdateRepositoriesForm {
-    return new static(
-      $container->get('drupaleasy_repositories.service'),
-      $container->get('drupaleasy_repositories.batch'),
-      $container->get('entity_type.manager'),
-    );
-  }
-
-  /**
    * Class constructor.
    *
    * @param Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService $repositoriesService
@@ -41,6 +30,17 @@ final class UpdateRepositoriesForm extends FormBase {
     $this->repositoriesService = $repositoriesService;
     $this->drupaleasyRepositoriesBatch = $drupaleasyRepositoriesBatch;
     $this->entityTypeManager = $entityTypeManager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container): UpdateRepositoriesForm {
+    return new static(
+      $container->get('drupaleasy_repositories.service'),
+      $container->get('drupaleasy_repositories.batch'),
+      $container->get('entity_type.manager'),
+    );
   }
 
   /**
