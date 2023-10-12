@@ -7,6 +7,7 @@ namespace Drupal\drupaleasy_repositories\Form;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\drupaleasy_repositories\DrupaleasyRepositoriesBatch;
 use Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,26 +17,47 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class UpdateRepositoriesForm extends FormBase {
 
   /**
+   * The DrupalEasy repositories service.
+   *
+   * @var \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService
+   */
+  protected DrupaleasyRepositoriesService $repositoriesService;
+
+  /**
+   * The DrupalEasy repositories batch service.
+   *
+   * @var \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesBatch
+   */
+  protected DrupaleasyRepositoriesBatch $druapleasyRepositoriesBatch;
+
+  /**
+   * The Entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): UpdateRepositoriesForm {
     return new static(
       $container->get('drupaleasy_repositories.service'),
+      $container->get('drupaleasy_repositories.batch'),
       $container->get('entity_type.manager'),
     );
   }
 
   /**
-   * The constructor.
-   *
-   * @param \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService $repositoriesService
-   *   The Drupaleasy Repositories service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The Drupal core entity type manager service.
+   * Class constructor.
    */
-  public function __construct(protected DrupaleasyRepositoriesService $repositoriesService, protected EntityTypeManagerInterface $entityTypeManager) {
-    $this->repositoriesService = $repositoriesService;
-    $this->entityTypeManager = $entityTypeManager;
+  public function __construct(
+    DrupaleasyRepositoriesService $repositories_service,
+    DrupaleasyRepositoriesBatch $drupaleasy_repositories_batch,
+    EntityTypeManagerInterface $entity_type_manager) {
+    $this->repositoriesService = $repositories_service;
+    $this->druapleasyRepositoriesBatch = $drupaleasy_repositories_batch;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -76,10 +98,27 @@ final class UpdateRepositoriesForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Submit the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
-    $this->messenger()->addStatus($this->t('The message has been sent.'));
+    if ($uid = $form_state->getValue('uid')) {
+      /** @var \Drupal\user\UserStorageInterface $user_storage */
+      $user_storage = $this->entityTypeManager->getStorage('user');
+
+      $account = $user_storage->load($uid);
+      if ($account) {
+        if ($this->repositoriesService->updateRepositories($account)) {
+          $this->messenger()->addMessage($this->t('Repositories updated.'));
+        }
+      }
+      else {
+        $this->messenger()->addMessage($this->t('User does not exist.'));
+      }
+    }
+    else {
+      $this->druapleasyRepositoriesBatch->updateAllUserRepositories();
+    }
+
   }
 
 }
