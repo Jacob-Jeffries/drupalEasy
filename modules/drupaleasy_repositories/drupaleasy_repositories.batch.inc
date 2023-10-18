@@ -1,4 +1,4 @@
-<?
+<?php
 
 /**
  * @file
@@ -10,7 +10,7 @@
  *
  * @param int $uid
  *   User ID to update.
- * @param array|\ArrayAccess $context
+ * @param array<mixed>|\ArrayAccess $context
  *   Batch API context.
  */
 function drupaleasy_update_repositories_batch_operation(int $uid, array|\ArrayAccess &$context): void {
@@ -28,9 +28,9 @@ function drupaleasy_update_repositories_batch_operation(int $uid, array|\ArrayAc
  *
  * @param bool $success
  *   Did the batch complete successfully?
- * @param array $results
+ * @param array<mixed> $results
  *   Array of results of batch operations.
- * @param array $operations
+ * @param array<int, string|array<mixed>> $operations
  *   Array of operations called.
  */
 function drupaleasy_update_all_repositories_finished(bool $success, array $results, array $operations): void {
