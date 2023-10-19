@@ -9,7 +9,7 @@ drupaleasy_repositories.settings:
 drupaleasy_repositories.update_repositories:
   path: '/admin/config/services/repositories-update'
   defaults:
-    _title: 'DrupalEasy repositories - update'
+    _title: 'DrupalEasy Repositories Update'
     _form: 'Drupal\drupaleasy_repositories\Form\UpdateRepositoriesForm'
   requirements:
     _permission: 'configure drupaleasy repositories'

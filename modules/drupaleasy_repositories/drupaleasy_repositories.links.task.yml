@@ -4,7 +4,7 @@ drupaleasy_repositories.settings:
   base_route: drupaleasy_repositories.settings
   weight: 10
 drupaleasy_repositories.update_repositories:
-  title: Update repository nodes
+  title: Update Repository Nodes
   route_name: drupaleasy_repositories.update_repositories
   base_route: drupaleasy_repositories.settings
   weight: 20
