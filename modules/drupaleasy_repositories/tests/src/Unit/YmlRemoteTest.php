@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\drupaleasy_repositories\Unit;
 
+use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\drupaleasy_repositories\Plugin\DrupaleasyRepositories\YmlRemote;
+use Drupal\key\KeyRepositoryInterface;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -43,16 +45,18 @@ final class YmlRemoteTest extends UnitTestCase {
     // We need to fake complicated depencendies here for messenger & key.
     // Mocking creates a fake dependency service.
     // Mock the Messenger Service.
-    $messenger = $this->getMockBuilder('\Drupal\Core\Messenger\MessengerInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->messenger = $this->createMock(MessengerInterface::class);
+    $this->keyRepository = $this->createMock(KeyRepositoryInterface::class);
 
+    // $this->messenger = $this->getMockBuilder('\Drupal\Core\Messenger\MessengerInterface')->disableOriginalConstructor()->getMock();
+    // $this->messenger->expects($this->any())->willReturn(TRUE)->method('addStatus');
     // Mock the Key Repository Service.
-    $keyRepository = $this->getMockBuilder('\Drupal\key\KeyRepositoryInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    // $this->keyRepository = $this->getMockBuilder('\Drupal\key\KeyRepositoryInterface')->disableOriginalConstructor()->getMock();
+    $this->ymlRemote = new YmlRemote([], 'yml_remote', [], $this->messenger, $this->keyRepository);
 
-    $this->ymlRemote = new YmlRemote([], 'yml_remote', [], $messenger, $keyRepository);
+    // We need to add this because YmlRemoteTest::getRepo() calls t().
+    $this->ymlRemote->setStringTranslation($this->getStringTranslationStub());
+
   }
 
   /**

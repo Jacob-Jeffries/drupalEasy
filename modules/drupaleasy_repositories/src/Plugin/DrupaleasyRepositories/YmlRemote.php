@@ -65,6 +65,9 @@ final class YmlRemote extends DrupaleasyRepositoriesPluginBase {
         $repo_info = Yaml::decode($file_content);
         $repo_machine_name = array_key_first($repo_info);
         $repo_data = reset($repo_info);
+
+        $this->messenger->addStatus($this->t('The Repository has been found.'));
+
         // Return our data in a preformatted array.
         return $this->mapToCommonFormat($repo_machine_name, $repo_data['label'], $repo_data['description'], $repo_data['num_open_issues'], $uri);
       }

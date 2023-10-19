@@ -14,6 +14,8 @@
  *   Batch API context.
  */
 function drupaleasy_update_repositories_batch_operation(int $uid, array|\ArrayAccess &$context): void {
+
+  // Initialize the Context - it is a counter for number of executions.
   if (empty($context['results']['num'])) {
     $context['results']['num'] = 0;
   }

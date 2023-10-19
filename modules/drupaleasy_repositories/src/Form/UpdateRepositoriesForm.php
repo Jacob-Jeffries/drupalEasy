@@ -93,7 +93,7 @@ final class UpdateRepositoriesForm extends FormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     if (!is_null($form_state->getValue('uid')) && ((int) $form_state->getValue('uid') === 0)) {
-      $form_state->setErrorByName('uid', $this->t('You may not select the Anonymous user.'));
+      $form_state->setErrorByName('uid', (string) $this->t('You may not select the Anonymous user.'));
     }
   }
 
