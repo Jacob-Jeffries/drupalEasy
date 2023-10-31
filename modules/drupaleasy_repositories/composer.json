@@ -8,5 +8,21 @@
 		"guzzlehttp/guzzle": "^7.0.1",
 		"http-interop/http-factory-guzzle": "^1.0",
 		"drupal/key": "^1.17"
-	}
+	},
+
+  "require-dev": {
+    "drush/drush": "^11.1"
+  },
+
+  "suggest": {
+    "drush/drush": "^11.1"
+  },
+
+  "extra": {
+    "drush": {
+      "services": {
+        "drush.services.yml": "^11.1"
+      }
+    }
+  }
 }
