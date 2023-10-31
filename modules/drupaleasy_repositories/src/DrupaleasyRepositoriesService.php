@@ -4,11 +4,14 @@ declare(strict_types = 1);
 
 namespace Drupal\drupaleasy_repositories;
 
+use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\drupaleasy_repositories\Event\RepoUpdatedEvent;
+use Drupal\node\NodeInterface;
 
 /**
  * This is our custom service for the plugin.
@@ -25,6 +28,8 @@ final class DrupaleasyRepositoriesService {
    *   The configuration factory interface.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity_type.manager service.
+   * @param Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher $eventDistpatcher
+   *   The Event Dispatcher.
    * @param bool $dryRun
    *   When set to TRUE, no nodes are CRUD'd, defaulted to FALSE.
    *
@@ -34,6 +39,7 @@ final class DrupaleasyRepositoriesService {
     protected PluginManagerInterface $pluginManagerDrupaleasyRepositories,
     protected ConfigFactoryInterface $configFactory,
     protected EntityTypeManagerInterface $entityTypeManager,
+    protected ContainerAwareEventDispatcher $eventDistpatcher,
     protected bool $dryRun = FALSE,
   ) {}
 
@@ -247,7 +253,7 @@ final class DrupaleasyRepositoriesService {
           // save to the DB.
           if (!$this->dryRun) {
             $node->save();
-            // $this->repoUpdated($node, 'updated');
+            $this->repoUpdated($node, 'updated');
           }
         }
       }
@@ -269,6 +275,7 @@ final class DrupaleasyRepositoriesService {
         if (!$this->dryRun) {
           $node->save();
         }
+        $this->repoUpdated($node, 'created');
       }
     }
     return FALSE;
@@ -306,7 +313,7 @@ final class DrupaleasyRepositoriesService {
       foreach ($nodes as $node) {
         if (!$this->dryRun) {
           $node->delete();
-          // $this->repoUpdated($node, 'deleted');
+          $this->repoUpdated($node, 'deleted');
         }
       }
     }
@@ -343,6 +350,20 @@ final class DrupaleasyRepositoriesService {
     else {
       return TRUE;
     }
+  }
+
+  /**
+   * Event Dispatcher for node CRUDs.
+   *
+   * @param Drupal\node\NodeInterface $node
+   *   The node that got updated.
+   * @param [type] $action
+   *   The action that took place.
+   */
+  protected function repoUpdated(NodeInterface $node, string $action): void {
+    // Dispatch the event with.
+    $event = new RepoUpdatedEvent($node, $action);
+    $this->eventDistpatcher->dispatch($event, RepoUpdatedEvent::REPO_UPDATED);
   }
 
 }
