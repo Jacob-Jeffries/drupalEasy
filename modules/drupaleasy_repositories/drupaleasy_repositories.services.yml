@@ -16,3 +16,6 @@ services:
 # Parameters are a Top-Level attribute, the same as services.
 parameters:
   drupaleasy_repositories.dry_run: FALSE
+
+  drupaleasy_repositories.uninstall_validator:
+    class: Drupal\drupaleasy_repositories\UninstallValidator

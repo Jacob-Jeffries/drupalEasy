@@ -7,6 +7,15 @@
 
 declare(strict_types = 1);
 
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_schema().
+ */
+function drupaleasy_repositories_schema(): void {
+  \Drupal::messenger()->addStatus('Module DrupalEasy Repositories has run Hook_Schema.');
+}
+
 /**
  * Implements hook_install().
  */
@@ -17,6 +26,7 @@ function drupaleasy_repositories_install(): void {
 /**
  * Implements hook_uninstall().
  */
-function drupaleasy_repositories_uninstall(): void {
-  \Drupal::messenger()->addStatus(t('Module DrupalEasy Repositories has been uninstalled.'));
+function drupaleasy_repositories_uninstall() {
+  FieldStorageConfig::loadByName('user', 'field_repository_url')->delete();
+  \Drupal::service('messenger')->addStatus('The Repository URL field on the user entity has been deleted.');
 }
