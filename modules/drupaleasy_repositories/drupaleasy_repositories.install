@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the DrupalEasy Repositories module.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_install().
+ */
+function drupaleasy_repositories_install(): void {
+  \Drupal::messenger()->addStatus(t('Module DrupalEasy Repositories has been installed.'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function drupaleasy_repositories_uninstall(): void {
+  \Drupal::messenger()->addStatus(t('Module DrupalEasy Repositories has been uninstalled.'));
+}
