@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the DrupalEasy Repositories module.
+ * Install and uninstall functions for the DrupalEasy Repositories module.
  */
 
 declare(strict_types = 1);

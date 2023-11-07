@@ -1,5 +1,3 @@
-# This is a typical Drupal Services Definition File.
-# It points to the service: Plugin Manager, for our module.
 services:
   plugin.manager.drupaleasy_repositories:
     class: Drupal\drupaleasy_repositories\DrupaleasyRepositories\DrupaleasyRepositoriesPluginManager
@@ -11,11 +9,13 @@ services:
 
   drupaleasy_repositories.batch:
     class: Drupal\drupaleasy_repositories\DrupaleasyRepositoriesBatch
-    arguments: ['@drupaleasy_repositories.service', '@entity_type.manager', '@extension.list.module']
-
-# Parameters are a Top-Level attribute, the same as services.
-parameters:
-  drupaleasy_repositories.dry_run: FALSE
+    arguments: ['@entity_type.manager', '@extension.list.module', '@drupaleasy_repositories.service']
 
   drupaleasy_repositories.uninstall_validator:
-    class: Drupal\drupaleasy_repositories\UninstallValidator
+    class: Drupal\drupaleasy_repositories\DrupalEasyRepositoriesUninstallValidator
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: module_install.uninstall_validator }
+
+parameters:
+  drupaleasy_repositories.dry_run: false
