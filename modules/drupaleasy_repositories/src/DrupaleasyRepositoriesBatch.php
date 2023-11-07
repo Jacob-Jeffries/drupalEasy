@@ -16,17 +16,18 @@ class DrupaleasyRepositoriesBatch {
   /**
    * Batch service class to integrate with Batch API.
    *
-   * @param \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService $drupaleasyRepositoriesService
-   *   The DrupaleasyRepositories service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleExtensionList $extensionListModule
    *   The module extension list.
+   * @param \Drupal\drupaleasy_repositories\DrupaleasyRepositoriesService $drupaleasyRepositoriesService
+   *   The DrupaleasyRepositories service.   *.
    */
   public function __construct(
-    protected DrupaleasyRepositoriesService $drupaleasyRepositoriesService,
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected ModuleExtensionList $extensionListModule) {}
+    private readonly EntityTypeManagerInterface $entityTypeManager,
+    private readonly ModuleExtensionList $extensionListModule,
+    private readonly DrupaleasyRepositoriesService $drupaleasyRepositoriesService,
+  ) {}
 
   /**
    * Updates all user repositories using the Batch API.
