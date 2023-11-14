@@ -52,7 +52,8 @@ final class Github extends DrupaleasyRepositoriesPluginBase {
 
     // Setup authentication from the API.
     // https://github.com/KnpLabs/php-github-api/blob/master/doc/security.md
-    $this->setAuthentication();
+    // $this->setAuthentication();
+    $this->client = new Client();
 
     // Get the metadata from the API.
     try {
