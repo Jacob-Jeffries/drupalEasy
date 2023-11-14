@@ -1,0 +1,5 @@
+name: 'DrupalEasy Gitlab'
+type: module
+description: 'This is a plugin for the DrupalEasy Repositories package that facilitates GitLab projects.'
+package: DrupalEasy
+core_version_requirement: ^10
