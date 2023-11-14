@@ -37,7 +37,7 @@ final class Github extends DrupaleasyRepositoriesPluginBase {
    * {@inheritdoc}
    */
   public function validateHelpText(): string {
-    return 'https://github.com/{owner_name}/{repo_name}';
+    return 'https://github.com/<OWNER_NAME>/<REPO_NAME>';
   }
 
   /**
