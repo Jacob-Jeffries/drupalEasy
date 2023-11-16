@@ -30,7 +30,8 @@
         "drupaleasy/drupaleasy_gitlab": "^1.0",
         "drupaleasy/drupaleasy_notify": "^1.0",
         "drupaleasy/drupaleasy_repositories": "^1.0",
-        "drush/drush": "^12.1"
+        "drush/drush": "^12.1",
+        "mglaman/phpstan-drupal": "^1.2"
     },
     "conflict": {
         "drupal/drupal": "*"
