@@ -79,7 +79,7 @@ final class Gitlab extends DrupaleasyRepositoriesPluginBase {
     $open_issues = 0;
 
     foreach ($gitlab_issues as $issue) {
-      if ($issue['state'] == "opened"){
+      if ($issue['state'] == "opened") {
         $open_issues++;
       }
     }
